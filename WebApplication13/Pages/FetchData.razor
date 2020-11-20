@@ -1,0 +1,50 @@
+﻿@page "/"
+@page "/fetchdata"
+
+@using WebApplication13.Data
+@inject WeatherForecastService ForecastService
+
+<h1>Weather forecast</h1>
+
+<p>This component demonstrates fetching data from a service.</p>
+
+@if (forecasts == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <Radzen.Blazor.RadzenTabs SelectedIndexChanged="RefreshSelection">
+        <Tabs>
+            @foreach (var forecast in forecasts)
+            {
+                <Radzen.Blazor.RadzenTabsItem>
+                    <Template Context="tab">
+                        @forecast - @AmISelected(tab.Selected)
+                    </Template>
+                    <ChildContent>
+                        @forecast.Summary
+                    </ChildContent>
+                </Radzen.Blazor.RadzenTabsItem>
+            }
+        </Tabs>
+    </Radzen.Blazor.RadzenTabs>
+}
+
+@code {
+    private WeatherForecast[] forecasts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
+    }
+    public void RefreshSelection(int index)
+    {
+        StateHasChanged();
+    }
+
+    public string AmISelected(bool selected)
+    {
+        return selected ? "yes" : "no";
+    }
+}
